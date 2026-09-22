@@ -11,10 +11,17 @@ const FILTER_MAP = {
 };
 const FILTER_NAMES = Object.keys(FILTER_MAP);
 
+const initialTasks = () => {
+  const asdf = localStorage.getItem("tasks");
+  return JSON.parse(asdf) || []
+};
 
-function App(props) {
-  const [tasks, setTasks] = useState(props.tasks);
+
+function App() {
+  const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState("All");
+
+  localStorage.setItem("tasks", JSON.stringify(tasks)) || [];
 
   function addTask(name) {
     if (name.trim().toUpperCase() === "REACT") {
