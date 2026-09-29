@@ -1,18 +1,19 @@
-import {useEffect, useState, useRef} from "react";
+import {useEffect, useState, useRef, usePrevious} from "react";
 
 function Todo(props) {
     const [isEditing, setEditing] = useState(false);
     const [newName, setNewName] = useState("");
     const editFieldRef = useRef(null);
     const editButtonRef = useRef(null);
+    const wasEditing = usePrevious(isEditing);
 
     useEffect(() => {
-    if (isEditing) {
+    if (!wasEditing && isEditing) {
         editFieldRef.current.focus();
-    } else {
+    } else if (wasEditing && !isEditing) {
         editButtonRef.current.focus();
     }
-    }, [isEditing]);
+    }, [wasEditing, isEditing]);
 
     function handleChange(e) {
         setNewName(e.target.value);
@@ -23,6 +24,15 @@ function Todo(props) {
         setNewName("");
         setEditing(false);
     }
+
+    function usePrevious(value) {
+        const ref = useRef();
+        useEffect(() => {
+            ref.current = value;
+        });
+        return ref.current;
+    }
+
     const editingTemplate = (
     <form className="stack-small" onSubmit={handleSubmit}>        <div className="form-group">
             <label className="todo-label" htmlFor={props.id}>
