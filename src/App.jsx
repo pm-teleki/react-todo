@@ -1,7 +1,7 @@
 import Form from "./components/Form";
 import FilterButton from "./components/FilterButton";
 import Todo from "./components/Todo";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { nanoid } from "nanoid";
 
 const FILTER_MAP = {
@@ -16,10 +16,26 @@ const initialTasks = () => {
   return JSON.parse(asdf) || []
 };
 
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
 
 function App() {
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState("All");
+  const prevTaskLength = usePrevious(tasks.length);
+  const listHeadingRef = useRef(null);
+
+  useEffect(() => {
+    if (tasks.length < prevTaskLength) {
+      listHeadingRef.current.focus();
+    }
+  }, [tasks.length, prevTaskLength]);
 
   localStorage.setItem("tasks", JSON.stringify(tasks)) || [];
 
@@ -94,7 +110,9 @@ function App() {
           {filterList}
         </div>
       </div>
-      <h2 id="list-heading">{headingText}</h2>
+      <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
+        {headingText}
+      </h2>
       <ul
         role="list"
         className="todo-list stack-large stack-exception"
