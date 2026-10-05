@@ -44,7 +44,7 @@ function App() {
       alert("You cannot add a task with the name 'REACT'.");
       return;
     }
-    const newTask = { id: `todo-${nanoid()}`, name, completed: false };
+    const newTask = { id: `todo-${nanoid()}`, name, completed: false, priority: 0 };
     setTasks([...tasks, newTask]);
   }
   function toggleTaskCompleted(id) {
@@ -53,7 +53,7 @@ function App() {
       if (id === task.id) {
         // use object spread to make a new object
         // whose `completed` prop has been inverted
-        return { ...task, completed: !task.completed };
+        return { ...task, completed: !task.completed, priority: task.priority };
       }
       return task;
     });
@@ -63,12 +63,12 @@ function App() {
     const remainingTasks = tasks.filter((task) => id !== task.id);
     setTasks(remainingTasks);
   }
-  function editTask(id, newName) {
+  function editTask(id, newName, newPriority) {
     const editedTaskList = tasks.map((task) => {
       // if this task has the same ID as the edited task
       if (id === task.id) {
-        // Copy the task and update its name
-        return { ...task, name: newName };
+        // Copy the task and update its name and priority
+        return { ...task, name: newName, priority: newPriority };
       }
       // Return the original task if it's not the edited task
       return task;
@@ -91,6 +91,7 @@ function App() {
         id={task.id}
         name={task.name}
         completed={task.completed}
+        priority={task.priority}
         key={task.id}
         toggleTaskCompleted={toggleTaskCompleted}
         deleteTask={deleteTask}
