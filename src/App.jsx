@@ -3,6 +3,8 @@ import FilterButton from "./components/FilterButton";
 import Todo from "./components/Todo";
 import { useState, useEffect, useRef } from "react";
 import { nanoid } from "nanoid";
+import axios from "axios";
+
 
 const FILTER_MAP = {
   All: () => true,
@@ -28,6 +30,7 @@ function usePrevious(value) {
 function App() {
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState("All");
+  const [serverStatus, setServerStatus] = useState("pending");
   const prevTaskLength = usePrevious(tasks.length);
   const listHeadingRef = useRef(null);
 
@@ -38,6 +41,20 @@ function App() {
   }, [tasks.length, prevTaskLength]);
 
   localStorage.setItem("tasks", JSON.stringify(tasks)) || [];
+
+  useEffect(() => {
+    const fetchServerStatus = async () => {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await axios.get("/", { timeout: 10000 });
+        setServerStatus("online");
+      } catch (error) {
+        console.error("Error fetching server status:", error);
+        setServerStatus("offline");
+      }
+    };
+    fetchServerStatus();
+  }, []);
 
   function addTask(name) {
     if (name.trim().toUpperCase() === "REACT") {
@@ -104,7 +121,8 @@ function App() {
 
   return (
     <div className="todoapp stack-large">
-      <h1>TodoMatic</h1>
+      <h1>TodoMatic </h1>
+      <p id="server-status" status={serverStatus}>{serverStatus}</p>
       <Form addTask={addTask}/>
       <div className="filters btn-group stack-exception">
         <div className="filters btn-group stack-exception">
@@ -120,6 +138,7 @@ function App() {
         aria-labelledby="list-heading">
         {taskList}
       </ul>
+    <button> hello</button>
     </div>
   );
 }
