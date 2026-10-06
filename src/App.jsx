@@ -31,6 +31,7 @@ function App() {
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState("All");
   const [serverStatus, setServerStatus] = useState("pending");
+  const [serverReady, setServerReady] = useState(false);
   const prevTaskLength = usePrevious(tasks.length);
   const listHeadingRef = useRef(null);
 
@@ -40,21 +41,42 @@ function App() {
     }
   }, [tasks.length, prevTaskLength]);
 
-  localStorage.setItem("tasks", JSON.stringify(tasks)) || [];
-
   useEffect(() => {
-    const fetchServerStatus = async () => {
+    let cancelled = false;
+
+    const loadTasks = async () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        await axios.get("/", { timeout: 10000 });
+        const { data } = await axios.get("/api/todos", { timeout: 10000 });
+        if (cancelled) return;
+        setTasks(Array.isArray(data) ? data : []);
         setServerStatus("online");
       } catch (error) {
-        console.error("Error fetching server status:", error);
+        console.error("Error loading todos from server:", error);
+        if (cancelled) return;
         setServerStatus("offline");
+      } finally {
+        if (!cancelled) setServerReady(true);
       }
     };
-    fetchServerStatus();
+
+    loadTasks();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!serverReady) return;
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    axios.put("/api/todos", tasks, { timeout: 10000 })
+      .then(() => setServerStatus("online"))
+      .catch((error) => {
+        console.error("Error saving todos to server:", error);
+        setServerStatus("offline");
+      });
+  }, [tasks, serverReady]);
 
   function addTask(name) {
     if (name.trim().toUpperCase() === "REACT") {
