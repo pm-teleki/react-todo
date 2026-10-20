@@ -19,6 +19,24 @@ h2 {
   margin-bottom: 0;
 }
 
+#server-status {
+  font-size: 1.6rem;
+  font-weight: bold;
+  padding: 5px;
+  justify-self: center;
+  margin: 0;
+}
+#server-status[status="online"] {
+  background-color: lawngreen;
+}
+#server-status[status="offline"] {
+  background-color: orangered;
+}
+#server-status[status="pending"] {
+  background-color: gray;
+}
+
+
 ul {
   list-style: none;
   padding: 0;

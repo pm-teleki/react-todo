@@ -14,3 +14,16 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Run the todo app
+
+Start the API and Vite app in separate terminals:
+
+```sh
+npm run server
+npm run dev
+```
+
+The API listens on port 3001, and Vite proxies `/api` requests to it. Todos
+are stored in `data/todos.json` and restored when the app loads. The browser
+also caches todos locally while the API is unavailable.
